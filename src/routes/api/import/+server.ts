@@ -5,6 +5,16 @@ import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request }) => {
 	const { importObj } = await request.json();
+
+	if (process.env.ENVIRONMENT === 'DEMO') {
+		return json(
+			{
+				error: 'This action is not allowed in demo mode'
+			},
+			{ status: 403 }
+		);
+	}
+
 	await connectDB();
 
 	for (const box of importObj) {

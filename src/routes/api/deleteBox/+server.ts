@@ -5,6 +5,16 @@ import type { RequestHandler } from './$types';
 
 export const DELETE: RequestHandler = async ({ request }) => {
 	const { id } = await request.json();
+
+	if (process.env.ENVIRONMENT === 'DEMO') {
+		return json(
+			{
+				error: 'This action is not allowed in demo mode'
+			},
+			{ status: 403 }
+		);
+	}
+
 	await connectDB();
 	try {
 		let deletedBox = await Box.findOneAndDelete({ _id: id });

@@ -5,6 +5,16 @@ import type { RequestHandler } from './$types';
 
 export const PATCH: RequestHandler = async ({ request }) => {
 	const { id, contents } = await request.json();
+
+	if (process.env.ENVIRONMENT === 'DEMO') {
+		return json(
+			{
+				error: 'This action is not allowed in demo mode'
+			},
+			{ status: 403 }
+		);
+	}
+
 	if (!id || !contents) {
 		return json({ error: 'Invalid request' }, { status: 400 });
 	}
