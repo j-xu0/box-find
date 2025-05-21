@@ -112,7 +112,7 @@
 			addToast('error', 'Error creating a new box', `A box with id: "${id}" already exists.`);
 		} else {
 			modalShow = false;
-			addToast('error', 'Error creating a new box', 'An unknown error has occurred.');
+			addToast('error', 'Error creating a new box', resJson.error || 'An unknown error has occurred.');
 		}
 	};
 
