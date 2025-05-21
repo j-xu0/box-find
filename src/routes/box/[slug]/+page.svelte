@@ -166,7 +166,7 @@
 		} else if (res.status == 404) {
 			addToast('error', 'Box not found.', `Box with id: ${id} was not found.`);
 		} else {
-			addToast('error', 'Oops, something went wrong.', `An error occured. "${resJson.error}"`);
+			addToast('error', 'Oops, something went wrong.', `An error occurred. ${resJson.error}`);
 		}
 	};
 	const renameBox = async () => {
@@ -182,7 +182,7 @@
 			goto(`/box/${editBoxName}`);
 			id = editBoxName;
 		} else {
-			addToast('error', 'Oops, something went wrong.', `An error occured, status: ${res.status}.`);
+			addToast('error', 'Oops, something went wrong.', `An error occurred, status: ${res.status}.`);
 		}
 	};
 	const splicePhoto = (index: number) => {
