@@ -23,14 +23,15 @@ export const load: PageServerLoad = async ({ params }) => {
 		redirect(307, `/page/${page}`);
 	}
 
-	const boxes = await Box.find({}, 'images contents')
+	const boxes = await Box.find({}, 'id images contents')
 		.sort({ lastModified: -1 })
 		.skip((page - 1) * 10)
 		.limit(10)
+		.select('-_id')
 		.lean()
 		.exec();
 
-	contents = boxes.map((box) => {
+	contents = boxes.map(({ _id, ...box }) => {
 		if (box.images.length > 5) {
 			box.images = box.images.slice(0, 5);
 		}

@@ -1,5 +1,5 @@
 export type boxData = {
-	_id: string;
+	id: string;
 	contents: string;
 	images: string[];
 	lastModified: Date;
@@ -7,7 +7,7 @@ export type boxData = {
 };
 
 export type boxDataLean = {
-	_id: string;
+	id: string;
 	contents: string;
 	images: string[];
 };
