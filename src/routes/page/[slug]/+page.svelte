@@ -172,8 +172,8 @@
 		<!-- default home page -->
 		<!-- likely will change searching behavior -->
 		{#each data.contents as item}
-			<ClickableTile href="/box/{encodeURIComponent(item._id)}" style="margin-bottom: 1em;">
-				<h2>{item._id}</h2>
+			<ClickableTile href="/box/{encodeURIComponent(item.id)}" style="margin-bottom: 1em;">
+				<h2>{item.id}</h2>
 				<Truncate>
 					{item.contents.replace(/\n/g, ', ')}
 				</Truncate>
@@ -185,7 +185,7 @@
 						{#each item.images as photo}
 							<img
 								src={photo}
-								alt={composeImageAltText(item._id)}
+								alt={composeImageAltText(item.id)}
 								style="min-width: 200px; width: 10vw; max-height: 350px;"
 							/>
 						{/each}
@@ -199,8 +199,8 @@
 	{:else if results.length > 0 || (searching && results.length > 0)}
 		<!-- search results -->
 		{#each results as item}
-			<ClickableTile href="/box/{encodeURIComponent(item.item._id)}" style="margin-bottom: 1em;">
-				<h2>{item.item._id}</h2>
+			<ClickableTile href="/box/{encodeURIComponent(item.item.id)}" style="margin-bottom: 1em;">
+				<h2>{item.item.id}</h2>
 				<Truncate>
 					{item.item.contents.replace(/\n/g, ', ')}
 				</Truncate>
@@ -212,7 +212,7 @@
 						{#each item.item.images as photo}
 							<img
 								src={photo}
-								alt={composeImageAltText(item.item._id)}
+								alt={composeImageAltText(item.item.id)}
 								style="min-width: 200px; width: 10vw; max-height: 350px;"
 							/>
 						{/each}

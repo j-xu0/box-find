@@ -17,7 +17,7 @@ export const PATCH: RequestHandler = async ({ request }) => {
 
 	try {
 		await connectDB();
-		const box = await Box.findById(id);
+		const box = await Box.findOne({ id: id }).exec();
 		if (box) {
 			box.images.pull(base64);
 			box.lastModified = Date.now();

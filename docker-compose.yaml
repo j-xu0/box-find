@@ -1,14 +1,13 @@
-version: "3"
 services:
   app:
-    image: box-find:0.1alpha
+    image: box-find:0.1alpha-bun
     ports:
       - "3000:3000"
     environment:
       - MONGO_USER=user
       - MONGO_PW=password8374
       - MONGO_URL=db
-      - MONGO_URI=user:password8374@mongodb/boxes-db
+      - MONGO_URI=mongodb://user:password8374@mongodb/boxes-db?authSource=admin
       - BODY_SIZE_LIMIT=50000000 # 50mb
     depends_on:
       - mongodb

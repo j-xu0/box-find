@@ -17,7 +17,7 @@ export const DELETE: RequestHandler = async ({ request }) => {
 
 	await connectDB();
 	try {
-		let deletedBox = await Box.findOneAndDelete({ _id: id });
+		let deletedBox = await Box.findOneAndDelete({ id: id });
 		if (!deletedBox) {
 			return json({ error: 'No box with id found' }, { status: 404 });
 		}

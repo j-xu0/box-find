@@ -17,7 +17,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	}
 
 	await connectDB();
-	let insertedDoc = await createBox({ _id: id, contents: '', images: [] }).catch((e) => {
+	let insertedDoc = await createBox({ id: id, contents: '', images: [] }).catch((e) => {
 		return json(
 			{ error: 'Unexpected Server Error', details: (e as Error).message },
 			{ status: 500 }
@@ -27,6 +27,6 @@ export const POST: RequestHandler = async ({ request }) => {
 	if (insertedDoc instanceof Response) {
 		return insertedDoc;
 	}
-	let res = json({ id: insertedDoc._id }, { status: 201 });
+	let res = json({ id: insertedDoc.id }, { status: 201 });
 	return res;
 };
