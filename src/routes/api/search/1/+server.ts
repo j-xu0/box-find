@@ -9,10 +9,10 @@ export const GET: RequestHandler = async ({ url }) => {
 	if (!query) return json({ error: 'No query provided' }, { status: 400 });
 	await connectDB();
 
-	let contents = await Box.find({}, { contents: 1, images: 1 });
+	let contents = await Box.find({}, { id: 1, contents: 1, images: 1 }).select('-_id');
 	let res;
 
-	res = fuzzyFilter(contents, query, { fields: ['_id', 'contents'] });
+	res = fuzzyFilter(contents, query, { fields: ['id', 'contents'] });
 
 	return json(res);
 };

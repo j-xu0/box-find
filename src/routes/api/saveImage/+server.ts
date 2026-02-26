@@ -23,7 +23,7 @@ export const PATCH: RequestHandler = async ({ request }) => {
 		const compressedBase64 = `data:image/jpeg;base64,${compressedBuffer.toString('base64')}`;
 
 		await connectDB();
-		const box = await Box.findById(id);
+		const box = await Box.findOne({ id: id }).exec();
 		if (box) {
 			box.images.push(compressedBase64);
 			box.lastModified = Date.now();

@@ -14,19 +14,19 @@ export const PATCH: RequestHandler = async ({ request }) => {
 	try {
 		await connectDB();
 
-		const originalBox = await Box.findById(id);
+		const originalBox = await Box.findOne({ id: id }).exec();
 		if (!originalBox) {
 			return json({ error: 'Box not found' }, { status: 404 });
 		}
 		const newBox = await Box.create({
-			_id: editBoxName,
+			id: editBoxName,
 			contents: originalBox.contents,
 			images: originalBox.images,
 			lastModified: Date.now()
 		});
-		await Box.findByIdAndDelete({ _id: id });
+		await Box.findOneAndDelete({ id: id });
 
-		return json({ newID: newBox._id }, { status: 202 });
+		return json({ newID: newBox.id }, { status: 202 });
 	} catch (e) {
 		return json(
 			{ error: 'Unexpected Server Error', details: (e as Error).message },

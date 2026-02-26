@@ -10,7 +10,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	for (const box of importObj) {
 		try {
 			await Box.create({
-				_id: box._id,
+				id: box.id,
 				contents: box.contents,
 				images: box.images,
 				lastModified: Date.now()

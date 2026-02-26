@@ -11,7 +11,7 @@ export const PATCH: RequestHandler = async ({ request }) => {
 	try {
 		await connectDB();
 
-		const box = await Box.findById(id);
+		const box = await Box.findOne({ id: id }).exec();
 		if (box) {
 			box.contents = contents;
 			box.lastModified = Date.now();

@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 const boxSchema = new mongoose.Schema({
-	_id: { type: String, required: true, unique: true },
+	id: { type: String, required: true, unique: true },
 	contents: { type: String, required: false },
 	images: { type: [String], required: false },
 	lastModified: { type: Date, required: true }
