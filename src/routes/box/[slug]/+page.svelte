@@ -60,6 +60,7 @@
 	};
 
 	const save = async () => {
+		// TODO: fix error handling
 		let contentsSave = false;
 		let imgSave: number | null = 0;
 		let imgDel: number | null = 0;
@@ -86,7 +87,7 @@
 		}
 		if (newPhotos.length > 0) imgSave = await saveImgs();
 		if (delPhotos.length > 0) imgDel = await saveDelImg();
-		if (contentsSave || imgSave != null || imgDel != null) {
+		if (contentsSave || imgSave !== null || imgDel !== null) {
 			addToast('success', 'Success!', 'Changes have been saved.');
 		} else {
 			addToast('error', 'Oops, something went wrong.', `An error occured, status: ${error}.`);
@@ -102,10 +103,11 @@
 				'content-type': 'application/json'
 			}
 		});
-		if (res.ok) return true;
-		else return res.status;
+		return res.ok;
 	};
 	const saveImgs = async () => {
+		if (newPhotos.length == 0) return 0;
+
 		let values = await Promise.all(newPhotos.map((photo) => uploadImg(photo)));
 		newPhotos = [];
 
@@ -116,10 +118,10 @@
 		if (values.every((value) => value === true)) {
 			return values.length;
 		} else {
-			const firstFailure = values.find((value) => value !== true);
-			return firstFailure !== undefined ? firstFailure : null;
+			return null;
 		}
 	};
+
 	const unUploadImg = async (base64: string) => {
 		const res = await fetch('/api/delImage', {
 			method: 'PATCH',
@@ -128,27 +130,23 @@
 				'content-type': 'application/json'
 			}
 		});
-		if (res.ok) return true;
-		else return res.status;
+		return res.ok;
 	};
 	const saveDelImg = async () => {
-		if (delPhotos.length > 0) {
-			let values = await Promise.all(delPhotos.map((photo) => unUploadImg(photo)));
-			delPhotos = [];
+		if (delPhotos.length == 0) return 0;
 
-			if (values.length === 0) {
-				return 0;
-			}
+		let values = await Promise.all(delPhotos.map((photo) => unUploadImg(photo)));
+		delPhotos = [];
 
-			if (values.every((value) => value === true)) {
-				return values.length;
-			} else {
-				const firstFailure = values.find((value) => value !== true);
-				return firstFailure !== undefined ? firstFailure : null;
-			}
+		if (values.length === 0) {
+			return 0;
 		}
 
-		return 0;
+		if (values.every((value) => value === true)) {
+			return values.length;
+		} else {
+			return null;
+		}
 	};
 
 	const delBox = async () => {
