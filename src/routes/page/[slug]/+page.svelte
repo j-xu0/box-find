@@ -188,7 +188,7 @@
 					{item.contents.replace(/\n/g, ', ')}
 				</Truncate>
 				{#if item.images.length > 0}
-					<div class="content" style="border-bottom:1px solid; margin:.75em 0 .75em 0;" />
+					<div class="content" style="border-bottom:1px solid; margin:.75em 0 .75em 0;"></div>
 
 					<h4>Pictures</h4>
 					<MasonryGrid {defaultDirection} {gap} {align} {column}>
@@ -215,7 +215,7 @@
 					{item.item.contents.replace(/\n/g, ', ')}
 				</Truncate>
 				{#if item.item.images.length > 0}
-					<div class="content" style="border-bottom:1px solid; margin:.75em 0 .75em 0;" />
+					<div class="content" style="border-bottom:1px solid; margin:.75em 0 .75em 0;"></div>
 
 					<h4>Pictures</h4>
 					<MasonryGrid {defaultDirection} {gap} {align} {column}>

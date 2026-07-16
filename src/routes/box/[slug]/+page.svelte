@@ -293,7 +293,7 @@
 					bind:this={fileinput}
 					style="display:none;"
 				/>
-				<p />
+				<p></p>
 				<span class="imgWrapper">
 					<MasonryGrid {defaultDirection} {gap} {align} {column}>
 						{#each photos as photo, index}
