@@ -6,7 +6,7 @@ import type { RequestHandler } from './$types';
 export const PATCH: RequestHandler = async ({ request }) => {
 	const { id, contents } = await request.json();
 
-	if (!id || !contents) {
+	if (typeof id !== 'string' || id.length === 0 || typeof contents !== 'string') {
 		return json({ error: 'Invalid request' }, { status: 400 });
 	}
 	try {

@@ -23,6 +23,7 @@
 	import { MasonryGrid } from '@egjs/svelte-grid';
 
 	import type { toastData, toastType } from '$lib/types/types';
+	import { saveBoxChanges } from '$lib/save-workflow';
 
 	/** @type {import('./$types').PageData} */
 	export let data;
@@ -65,92 +66,39 @@
 			return;
 		}
 
-		// TODO: fix error handling
-		let contentsSave = false;
-		let imgSave: number | null = 0;
-		let imgDel: number | null = 0;
-		let error;
 		saving = true;
-		if (initContents != contents) {
-			const res = await fetch('/api/saveContent', {
-				method: 'PATCH',
-				body: JSON.stringify({ id, contents }),
-				headers: {
-					'content-type': 'application/json'
-				}
+		try {
+			const result = await saveBoxChanges({
+				id,
+				contents,
+				contentsChanged: initContents !== contents,
+				newPhotos,
+				delPhotos
 			});
-			if (!res.ok) {
+
+			if (result.contentsSaved) initContents = contents;
+			newPhotos = result.remainingUploads;
+			delPhotos = result.remainingDeletions;
+
+			if (result.outcome === 'success') {
+				addToast('success', 'Success!', 'Changes have been saved.');
+			} else if (result.outcome === 'partial') {
+				addToast(
+					'warning',
+					'Some changes were not saved.',
+					`${result.succeeded} of ${result.attempted} changes saved. ${result.failures.map(({ message }) => message).join('; ')}`
+				);
+			} else if (result.outcome === 'failure') {
 				addToast(
 					'error',
-					'Oops, something went wrong.',
-					`An error occurred, status: ${res.status}.`
+					'Changes were not saved.',
+					result.failures.map(({ message }) => message).join('; ')
 				);
 			} else {
-				contentsSave = true;
-				initContents = contents;
+				addToast('info', 'No changes to save.', 'Everything is already up to date.');
 			}
-		}
-		if (newPhotos.length > 0) imgSave = await saveImgs();
-		if (delPhotos.length > 0) imgDel = await saveDelImg();
-		if (contentsSave || imgSave !== null || imgDel !== null) {
-			addToast('success', 'Success!', 'Changes have been saved.');
-		} else {
-			addToast('error', 'Oops, something went wrong.', `An error occurred, status: ${error}.`);
-		}
-		saving = false;
-	};
-
-	const uploadImg = async (base64: string) => {
-		const res = await fetch('/api/saveImage', {
-			method: 'PATCH',
-			body: JSON.stringify({ id, base64 }),
-			headers: {
-				'content-type': 'application/json'
-			}
-		});
-		return res.ok;
-	};
-	const saveImgs = async () => {
-		if (newPhotos.length == 0) return 0;
-
-		let values = await Promise.all(newPhotos.map((photo) => uploadImg(photo)));
-		newPhotos = [];
-
-		if (values.length === 0) {
-			return 0;
-		}
-
-		if (values.every((value) => value === true)) {
-			return values.length;
-		} else {
-			return null;
-		}
-	};
-
-	const unUploadImg = async (base64: string) => {
-		const res = await fetch('/api/delImage', {
-			method: 'PATCH',
-			body: JSON.stringify({ id, base64 }),
-			headers: {
-				'content-type': 'application/json'
-			}
-		});
-		return res.ok;
-	};
-	const saveDelImg = async () => {
-		if (delPhotos.length == 0) return 0;
-
-		let values = await Promise.all(delPhotos.map((photo) => unUploadImg(photo)));
-		delPhotos = [];
-
-		if (values.length === 0) {
-			return 0;
-		}
-
-		if (values.every((value) => value === true)) {
-			return values.length;
-		} else {
-			return null;
+		} finally {
+			saving = false;
 		}
 	};
 
@@ -201,14 +149,15 @@
 		}
 	};
 	const splicePhoto = (index: number) => {
-		let isNewPhoto = false;
-		newPhotos = newPhotos.filter((photo) => {
-			photo !== photos[index];
-			isNewPhoto = true;
-		});
-		if (!isNewPhoto) delPhotos = [...delPhotos, photos[index]];
-		photos.splice(index, 1);
-		photos = [...photos];
+		const removedPhoto = photos[index];
+		const newPhotoIndex = newPhotos.indexOf(removedPhoto);
+
+		if (newPhotoIndex >= 0) {
+			newPhotos = newPhotos.filter((_, photoIndex) => photoIndex !== newPhotoIndex);
+		} else if (!delPhotos.includes(removedPhoto)) {
+			delPhotos = [...delPhotos, removedPhoto];
+		}
+		photos = photos.filter((_: string, photoIndex: number) => photoIndex !== index);
 	};
 	const newBox = async () => {
 		if (data.demoMode) {
