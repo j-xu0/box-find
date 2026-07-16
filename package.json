@@ -15,7 +15,7 @@
 	"type": "module",
 	"dependencies": {
 		"@egjs/svelte-grid": "^1.16.0",
-		"@sveltejs/kit": "^2.0.0",
+		"@sveltejs/kit": "^2.69.3",
 		"carbon-components-svelte": "^0.85.2",
 		"carbon-icons-svelte": "^12.11.0",
 		"dotenv": "^16.4.7",
@@ -23,18 +23,18 @@
 		"mongodb": "^6.9.0",
 		"mongoose": "^8.9.5",
 		"sharp": "^0.33.5",
-		"svelte": "^4.2.19",
-		"svelte-adapter-bun": "^0.5.2"
+		"svelte": "^5.56.5",
+		"svelte-adapter-bun": "^1.0.1"
 	},
 	"devDependencies": {
-		"@sveltejs/vite-plugin-svelte": "^3.0.0",
+		"@sveltejs/vite-plugin-svelte": "^7.2.0",
 		"@types/node": "^22.10.7",
-		"carbon-preprocess-svelte": "^0.11.9",
+		"carbon-preprocess-svelte": "^0.11.37",
 		"prettier": "^3.4.2",
-		"prettier-plugin-svelte": "^3.3.3",
-		"svelte-check": "^4.1.4",
+		"prettier-plugin-svelte": "^4.1.1",
+		"svelte-check": "^4.7.3",
 		"typescript": "^5.7.3",
-		"vite": "^5.4.11"
+		"vite": "^8.1.5"
 	},
 	"optionalDependencies": {
 		"@img/sharp-linux-x64": "^0.34.5",
