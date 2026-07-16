@@ -10,13 +10,7 @@ Locally hosted on a node server in Docker alongside mongoDB (see `docker-compose
 
 Set `ENVIRONMENT=DEMO` to make the application browse-only. In demo mode, the UI displays a notice and editing actions explain that changes are restricted. The server also rejects every non-read-only `/api/` request with `403`, so direct API calls cannot change data.
 
-The included Docker Compose deployment enables demo mode by default:
-
-```sh
-docker compose up
-```
-
-Change or remove the `ENVIRONMENT=DEMO` entry in `docker-compose.yaml` to allow changes in another deployment.
+To enable it with Docker Compose, uncomment the `ENVIRONMENT=DEMO` entry in `docker-compose.yaml`. The default deployment allows changes.
 
 ## API Routes
 

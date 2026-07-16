@@ -9,7 +9,8 @@ services:
       - MONGO_URL=db
       - MONGO_URI=mongodb://user:password8374@mongodb/boxes-db?authSource=admin
       - BODY_SIZE_LIMIT=50000000 # 50mb
-      - ENVIRONMENT=DEMO
+      # Uncomment to run the app in read-only demo mode.
+      # - ENVIRONMENT=DEMO
     depends_on:
       - mongodb
   mongodb:
