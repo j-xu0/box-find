@@ -4,7 +4,7 @@ import type { PageServerLoad } from './$types';
 import dotenv from 'dotenv';
 dotenv.config();
 
-export const load: PageServerLoad = async ({}) => {
+export const load: PageServerLoad = async () => {
 	let lastPage;
 	let contents;
 
