@@ -2,13 +2,15 @@ services:
   app:
     image: box-find:0.1alpha-bun
     ports:
-      - "3000:3000"
+      - '3000:3000'
     environment:
       - MONGO_USER=user
       - MONGO_PW=password8374
       - MONGO_URL=db
       - MONGO_URI=mongodb://user:password8374@mongodb/boxes-db?authSource=admin
       - BODY_SIZE_LIMIT=50000000 # 50mb
+      # Uncomment to run the app in read-only demo mode.
+      # - ENVIRONMENT=DEMO
     depends_on:
       - mongodb
   mongodb:
@@ -17,6 +19,7 @@ services:
       - MONGODB_INITDB_ROOT_USERNAME=user
       - MONGODB_INITDB_ROOT_PASSWORD=password8374
     volumes:
-      - type: bind
-        source: ./data
-        target: /data/db
+      - mongodb-data:/data/db
+
+volumes:
+  mongodb-data:

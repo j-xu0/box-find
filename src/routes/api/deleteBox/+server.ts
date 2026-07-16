@@ -5,6 +5,7 @@ import type { RequestHandler } from './$types';
 
 export const DELETE: RequestHandler = async ({ request }) => {
 	const { id } = await request.json();
+
 	await connectDB();
 	try {
 		let deletedBox = await Box.findOneAndDelete({ id: id });

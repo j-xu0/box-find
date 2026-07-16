@@ -6,6 +6,7 @@ import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request }) => {
 	const { id } = await request.json();
+
 	await connectDB();
 	let insertedDoc = await createBox({ id: id, contents: '', images: [] }).catch((e) => {
 		return json(

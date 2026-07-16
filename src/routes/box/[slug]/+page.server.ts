@@ -1,4 +1,4 @@
-import type { boxData } from '$lib/types/types';
+import type { boxData as BoxData } from '$lib/types/types';
 import Box from '$lib/models/box';
 import connectDB from '$lib/db/connect';
 import type { PageServerLoad } from './$types';
@@ -12,11 +12,12 @@ export const load: PageServerLoad = async ({ params }) => {
 	// Use .lean() to get a plain JavaScript object
 	const box = await Box.findOne({ id: id }).select('-_id').lean().exec();
 	const boxExist = box != null;
+	const boxData = box as unknown as BoxData | null;
 
 	return {
-		box: boxExist ? (box as boxData).id : null,
-		contents: boxExist && !Array.isArray(box) ? (box as boxData).contents : '',
-		images: boxExist && !Array.isArray(box) ? (box as boxData).images : [],
+		box: boxData?.id ?? null,
+		contents: boxData?.contents ?? '',
+		images: boxData?.images ?? [],
 		boxExist: boxExist
 	};
 };

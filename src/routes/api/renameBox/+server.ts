@@ -5,6 +5,7 @@ import type { RequestHandler } from './$types';
 
 export const PATCH: RequestHandler = async ({ request }) => {
 	const { id, editBoxName } = await request.json();
+
 	if (!id || !editBoxName) {
 		return json({ error: 'Missing required fields' }, { status: 400 });
 	}

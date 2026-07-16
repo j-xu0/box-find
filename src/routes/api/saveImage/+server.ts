@@ -6,6 +6,7 @@ import sharp from 'sharp';
 
 export const PATCH: RequestHandler = async ({ request }) => {
 	const { id, base64 } = await request.json();
+
 	if (!id || !base64) {
 		return json({ error: 'Missing id or base64' }, { status: 400 });
 	}

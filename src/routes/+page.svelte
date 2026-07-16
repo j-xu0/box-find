@@ -97,6 +97,12 @@
 	}
 
 	const newBox = async (id: string) => {
+		if (data.demoMode) {
+			modalShow = false;
+			addToast('error', 'Demo mode', 'Edits are restricted in demo mode.');
+			return;
+		}
+
 		const res = await fetch('/api/newBox', {
 			method: 'POST',
 			body: JSON.stringify({ id }),
@@ -113,7 +119,7 @@
 			addToast('error', 'Error creating a new box', `A box with id: "${id}" already exists.`);
 		} else {
 			modalShow = false;
-			addToast('error', 'Error creating a new box', `An unknown error occurred.`);
+			addToast('error', 'Error creating a new box', resJson.error || `An unknown error occurred.`);
 		}
 	};
 

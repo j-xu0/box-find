@@ -5,6 +5,7 @@ import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request }) => {
 	const { importObj } = await request.json();
+
 	await connectDB();
 
 	for (const box of importObj) {

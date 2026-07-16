@@ -60,6 +60,12 @@
 	};
 
 	const save = async () => {
+		if (data.demoMode) {
+			addToast('error', 'Demo mode', 'Edits are restricted in demo mode.');
+			return;
+		}
+
+		// TODO: fix error handling
 		let contentsSave = false;
 		let imgSave: number | null = 0;
 		let imgDel: number | null = 0;
@@ -77,7 +83,7 @@
 				addToast(
 					'error',
 					'Oops, something went wrong.',
-					`An error occured, status: ${res.status}.`
+					`An error occurred, status: ${res.status}.`
 				);
 			} else {
 				contentsSave = true;
@@ -86,10 +92,10 @@
 		}
 		if (newPhotos.length > 0) imgSave = await saveImgs();
 		if (delPhotos.length > 0) imgDel = await saveDelImg();
-		if (contentsSave || imgSave != null || imgDel != null) {
+		if (contentsSave || imgSave !== null || imgDel !== null) {
 			addToast('success', 'Success!', 'Changes have been saved.');
 		} else {
-			addToast('error', 'Oops, something went wrong.', `An error occured, status: ${error}.`);
+			addToast('error', 'Oops, something went wrong.', `An error occurred, status: ${error}.`);
 		}
 		saving = false;
 	};
@@ -102,10 +108,11 @@
 				'content-type': 'application/json'
 			}
 		});
-		if (res.ok) return true;
-		else return res.status;
+		return res.ok;
 	};
 	const saveImgs = async () => {
+		if (newPhotos.length == 0) return 0;
+
 		let values = await Promise.all(newPhotos.map((photo) => uploadImg(photo)));
 		newPhotos = [];
 
@@ -116,10 +123,10 @@
 		if (values.every((value) => value === true)) {
 			return values.length;
 		} else {
-			const firstFailure = values.find((value) => value !== true);
-			return firstFailure !== undefined ? firstFailure : null;
+			return null;
 		}
 	};
+
 	const unUploadImg = async (base64: string) => {
 		const res = await fetch('/api/delImage', {
 			method: 'PATCH',
@@ -128,30 +135,32 @@
 				'content-type': 'application/json'
 			}
 		});
-		if (res.ok) return true;
-		else return res.status;
+		return res.ok;
 	};
 	const saveDelImg = async () => {
-		if (delPhotos.length > 0) {
-			let values = await Promise.all(delPhotos.map((photo) => unUploadImg(photo)));
-			delPhotos = [];
+		if (delPhotos.length == 0) return 0;
 
-			if (values.length === 0) {
-				return 0;
-			}
+		let values = await Promise.all(delPhotos.map((photo) => unUploadImg(photo)));
+		delPhotos = [];
 
-			if (values.every((value) => value === true)) {
-				return values.length;
-			} else {
-				const firstFailure = values.find((value) => value !== true);
-				return firstFailure !== undefined ? firstFailure : null;
-			}
+		if (values.length === 0) {
+			return 0;
 		}
 
-		return 0;
+		if (values.every((value) => value === true)) {
+			return values.length;
+		} else {
+			return null;
+		}
 	};
 
 	const delBox = async () => {
+		if (data.demoMode) {
+			deleteModalOpen = false;
+			addToast('error', 'Demo mode', 'Edits are restricted in demo mode.');
+			return;
+		}
+
 		const res = await fetch('/api/deleteBox', {
 			method: 'DELETE',
 			body: JSON.stringify({ id }),
@@ -166,10 +175,16 @@
 		} else if (res.status == 404) {
 			addToast('error', 'Box not found.', `Box with id: ${id} was not found.`);
 		} else {
-			addToast('error', 'Oops, something went wrong.', `An error occured. "${resJson.error}"`);
+			addToast('error', 'Oops, something went wrong.', `An error occurred. ${resJson.error}`);
 		}
 	};
 	const renameBox = async () => {
+		if (data.demoMode) {
+			editModalOpen = false;
+			addToast('error', 'Demo mode', 'Edits are restricted in demo mode.');
+			return;
+		}
+
 		const res = await fetch('/api/renameBox', {
 			method: 'PATCH',
 			body: JSON.stringify({ id, editBoxName }),
@@ -182,7 +197,7 @@
 			goto(`/box/${editBoxName}`);
 			id = editBoxName;
 		} else {
-			addToast('error', 'Oops, something went wrong.', `An error occured, status: ${res.status}.`);
+			addToast('error', 'Oops, something went wrong.', `An error occurred, status: ${res.status}.`);
 		}
 	};
 	const splicePhoto = (index: number) => {
@@ -196,6 +211,11 @@
 		photos = [...photos];
 	};
 	const newBox = async () => {
+		if (data.demoMode) {
+			addToast('error', 'Demo mode', 'Edits are restricted in demo mode.');
+			return;
+		}
+
 		const res = await fetch('/api/newBox', {
 			method: 'POST',
 			body: JSON.stringify({ id }),
@@ -306,7 +326,7 @@
 			<div class="textBox">
 				<TextArea
 					labelText="Box Contents"
-					placeholder="List box items seprated by a new line..."
+					placeholder="List box items separated by a new line..."
 					bind:value={contents}
 				/>
 			</div>
