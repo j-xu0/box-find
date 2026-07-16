@@ -1,0 +1,21 @@
+{
+	"categories": {
+		"correctness": "error",
+		"suspicious": "warn"
+	},
+	"env": {
+		"browser": true,
+		"node": true,
+		"svelte": true
+	},
+	"overrides": [
+		{
+			"files": ["*.svelte"],
+			"rules": {
+				"no-unassigned-vars": "warn",
+				"no-unused-expressions": "warn"
+			}
+		}
+	],
+	"ignorePatterns": ["build", ".svelte-kit", "package"]
+}
