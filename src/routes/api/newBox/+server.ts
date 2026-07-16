@@ -7,15 +7,6 @@ import type { RequestHandler } from './$types';
 export const POST: RequestHandler = async ({ request }) => {
 	const { id } = await request.json();
 
-	if (process.env.ENVIRONMENT === 'DEMO') {
-		return json(
-			{
-				error: 'This action is not allowed in demo mode'
-			},
-			{ status: 403 }
-		);
-	}
-
 	await connectDB();
 	let insertedDoc = await createBox({ id: id, contents: '', images: [] }).catch((e) => {
 		return json(

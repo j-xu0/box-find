@@ -7,15 +7,6 @@ import sharp from 'sharp';
 export const PATCH: RequestHandler = async ({ request }) => {
 	const { id, base64 } = await request.json();
 
-	if (process.env.ENVIRONMENT === 'DEMO') {
-		return json(
-			{
-				error: 'This action is not allowed in demo mode'
-			},
-			{ status: 403 }
-		);
-	}
-
 	if (!id || !base64) {
 		return json({ error: 'Missing id or base64' }, { status: 400 });
 	}

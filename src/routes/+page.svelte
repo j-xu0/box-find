@@ -97,6 +97,12 @@
 	}
 
 	const newBox = async (id: string) => {
+		if (data.demoMode) {
+			modalShow = false;
+			addToast('error', 'Demo mode', 'Edits are restricted in demo mode.');
+			return;
+		}
+
 		const res = await fetch('/api/newBox', {
 			method: 'POST',
 			body: JSON.stringify({ id }),

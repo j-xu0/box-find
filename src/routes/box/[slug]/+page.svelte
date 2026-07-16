@@ -60,6 +60,11 @@
 	};
 
 	const save = async () => {
+		if (data.demoMode) {
+			addToast('error', 'Demo mode', 'Edits are restricted in demo mode.');
+			return;
+		}
+
 		// TODO: fix error handling
 		let contentsSave = false;
 		let imgSave: number | null = 0;
@@ -78,7 +83,7 @@
 				addToast(
 					'error',
 					'Oops, something went wrong.',
-					`An error occured, status: ${res.status}.`
+					`An error occurred, status: ${res.status}.`
 				);
 			} else {
 				contentsSave = true;
@@ -90,7 +95,7 @@
 		if (contentsSave || imgSave !== null || imgDel !== null) {
 			addToast('success', 'Success!', 'Changes have been saved.');
 		} else {
-			addToast('error', 'Oops, something went wrong.', `An error occured, status: ${error}.`);
+			addToast('error', 'Oops, something went wrong.', `An error occurred, status: ${error}.`);
 		}
 		saving = false;
 	};
@@ -150,6 +155,12 @@
 	};
 
 	const delBox = async () => {
+		if (data.demoMode) {
+			deleteModalOpen = false;
+			addToast('error', 'Demo mode', 'Edits are restricted in demo mode.');
+			return;
+		}
+
 		const res = await fetch('/api/deleteBox', {
 			method: 'DELETE',
 			body: JSON.stringify({ id }),
@@ -168,6 +179,12 @@
 		}
 	};
 	const renameBox = async () => {
+		if (data.demoMode) {
+			editModalOpen = false;
+			addToast('error', 'Demo mode', 'Edits are restricted in demo mode.');
+			return;
+		}
+
 		const res = await fetch('/api/renameBox', {
 			method: 'PATCH',
 			body: JSON.stringify({ id, editBoxName }),
@@ -194,6 +211,11 @@
 		photos = [...photos];
 	};
 	const newBox = async () => {
+		if (data.demoMode) {
+			addToast('error', 'Demo mode', 'Edits are restricted in demo mode.');
+			return;
+		}
+
 		const res = await fetch('/api/newBox', {
 			method: 'POST',
 			body: JSON.stringify({ id }),
@@ -304,7 +326,7 @@
 			<div class="textBox">
 				<TextArea
 					labelText="Box Contents"
-					placeholder="List box items seprated by a new line..."
+					placeholder="List box items separated by a new line..."
 					bind:value={contents}
 				/>
 			</div>
