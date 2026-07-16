@@ -6,9 +6,7 @@ export default defineConfig({
 	plugins: [sveltekit(), optimizeCss()],
 	build: {
 		rollupOptions: {
-			external: [
-				"sharp"
-			]
+			external: ['sharp']
 		}
 	}
 });

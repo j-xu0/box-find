@@ -1,6 +1,5 @@
 import { json } from '@sveltejs/kit';
 import createBox from '$lib/db/create';
-import Box from '$lib/models/box';
 import connectDB from '$lib/db/connect';
 import type { RequestHandler } from './$types';
 
