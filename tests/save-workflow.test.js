@@ -2,6 +2,7 @@
 import { describe, expect, test } from 'bun:test';
 import { saveBoxChanges } from '../src/lib/save-workflow.ts';
 
+const savedImage = 'data:image/jpeg;base64,YWFh';
 const jsonResponse = (body, status = 200) =>
 	new Response(JSON.stringify(body), {
 		status,
@@ -13,7 +14,7 @@ describe('saveBoxChanges', () => {
 		const requests = [];
 		const fetch = async (endpoint, options) => {
 			requests.push([endpoint, JSON.parse(options.body)]);
-			return jsonResponse({ status: 'ok' });
+			return jsonResponse({ status: 'ok', image: savedImage });
 		};
 
 		const result = await saveBoxChanges({
@@ -77,7 +78,7 @@ describe('saveBoxChanges', () => {
 			if (endpoint === '/api/delImage' && base64 === 'bad-delete') {
 				return new Response('storage unavailable', { status: 503 });
 			}
-			return jsonResponse({ status: 'ok' });
+			return jsonResponse({ status: 'ok', image: savedImage });
 		};
 
 		const result = await saveBoxChanges({
@@ -109,7 +110,7 @@ describe('saveBoxChanges', () => {
 			delPhotos: [],
 			fetch: async () => {
 				requestCount += 1;
-				return jsonResponse({ status: 'ok' });
+				return jsonResponse({ status: 'ok', image: savedImage });
 			}
 		});
 
@@ -147,4 +148,111 @@ describe('saveBoxChanges', () => {
 			'submitted text'
 		);
 	});
+});
+
+test('returns canonical photos for immediate deletion and uploads sequentially', async () => {
+	let active = 0;
+	let maximum = 0;
+	const result = await saveBoxChanges({
+		id: 'garage',
+		contents: '',
+		contentsChanged: false,
+		newPhotos: ['one', 'two', 'three'],
+		delPhotos: [],
+		fetch: async () => {
+			active++;
+			maximum = Math.max(maximum, active);
+			await new Promise((resolve) => setTimeout(resolve, 1));
+			active--;
+			return jsonResponse({ status: 'ok', image: savedImage });
+		}
+	});
+	expect(maximum).toBe(1);
+	expect(result.uploadedPhotos).toEqual(
+		['one', 'two', 'three'].map((original) => ({ original, image: savedImage }))
+	);
+});
+
+test('keeps uploads retryable when the server omits canonical identity', async () => {
+	const result = await saveBoxChanges({
+		id: 'garage',
+		contents: '',
+		contentsChanged: false,
+		newPhotos: ['one'],
+		delPhotos: [],
+		fetch: async () => jsonResponse({ status: 'ok' })
+	});
+	expect(result.outcome).toBe('failure');
+	expect(result.remainingUploads).toEqual(['one']);
+});
+
+test('re-added canonical photo supersedes deletion after its upload settles', async () => {
+	let completeUpload;
+	const delayedUpload = new Promise((resolve) => {
+		completeUpload = resolve;
+	});
+	const requests = [];
+	const otherPhoto = 'data:image/jpeg;base64,YmJi';
+	const failedPhoto = 'data:image/jpeg;base64,Y2Nj';
+	const save = saveBoxChanges({
+		id: 'garage',
+		contents: '',
+		contentsChanged: false,
+		newPhotos: ['original-source'],
+		delPhotos: [savedImage, otherPhoto, failedPhoto],
+		fetch: async (endpoint, options) => {
+			const { base64 } = JSON.parse(options.body);
+			requests.push([endpoint, base64]);
+			if (endpoint === '/api/saveImage') {
+				await delayedUpload;
+				return jsonResponse({ status: 'ok', image: savedImage });
+			}
+			if (base64 === failedPhoto) return jsonResponse({ error: 'storage unavailable' }, 503);
+			return jsonResponse({ status: 'ok' });
+		}
+	});
+	await Promise.resolve();
+	expect(requests).toEqual([['/api/saveImage', 'original-source']]);
+	completeUpload();
+	const result = await save;
+	expect(requests.filter(([endpoint]) => endpoint === '/api/delImage')).toEqual([
+		['/api/delImage', otherPhoto],
+		['/api/delImage', failedPhoto]
+	]);
+	expect(result.remainingUploads).toEqual([]);
+	expect(result.remainingDeletions).toEqual([failedPhoto]);
+	expect(result.uploadedPhotos).toEqual([{ original: 'original-source', image: savedImage }]);
+	expect(result.outcome).toBe('partial');
+});
+
+test('failed re-add keeps upload retryable and still performs the requested deletion', async () => {
+	let completeUpload;
+	const delayedUpload = new Promise((resolve) => {
+		completeUpload = resolve;
+	});
+	const requests = [];
+	const save = saveBoxChanges({
+		id: 'garage',
+		contents: '',
+		contentsChanged: false,
+		newPhotos: ['original-source'],
+		delPhotos: [savedImage],
+		fetch: async (endpoint) => {
+			requests.push(endpoint);
+			if (endpoint === '/api/saveImage') {
+				await delayedUpload;
+				return jsonResponse({ error: 'offline' }, 503);
+			}
+			return jsonResponse({ status: 'ok' });
+		}
+	});
+	await Promise.resolve();
+	expect(requests).toEqual(['/api/saveImage']);
+	completeUpload();
+	const result = await save;
+	expect(requests).toEqual(['/api/saveImage', '/api/delImage']);
+	expect(result.remainingUploads).toEqual(['original-source']);
+	expect(result.remainingDeletions).toEqual([]);
+	expect(result.uploadedPhotos).toEqual([]);
+	expect(result.outcome).toBe('partial');
 });

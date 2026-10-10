@@ -18,6 +18,7 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Textarea } from '$lib/components/ui/textarea';
 	import { Label } from '$lib/components/ui/label';
+	import { MAX_PHOTO_BYTES } from '$lib/photos';
 	import { saveBoxChanges } from '$lib/save-workflow';
 	import { navigationProtection } from '$lib/editor-protection';
 	import type { toastData, toastType } from '$lib/types/types';
@@ -120,6 +121,11 @@
 		if (busy) return;
 		const image = event.currentTarget.files?.[0];
 		if (!image) return;
+		if (image.size > MAX_PHOTO_BYTES) {
+			addToast('error', 'Photo too large', 'Choose a photo smaller than 10 MiB.');
+			fileInput.value = '';
+			return;
+		}
 
 		const reader = new FileReader();
 		photoReaders = [...photoReaders, reader];
@@ -132,7 +138,7 @@
 		});
 		reader.addEventListener('load', () => {
 			const photo = reader.result;
-			if (typeof photo !== 'string') return;
+			if (typeof photo !== 'string' || photos.includes(photo)) return;
 			photos = [...photos, photo];
 			newPhotos = [...newPhotos, photo];
 		});
@@ -168,6 +174,14 @@
 				delPhotos: [...deletedPhotos]
 			});
 
+			photos = [
+				...new Set(
+					photos.map(
+						(photo) =>
+							result.uploadedPhotos.find(({ original }) => original === photo)?.image ?? photo
+					)
+				)
+			];
 			if (result.contentsSaved) initialContents = submittedContents;
 			newPhotos = result.remainingUploads;
 			deletedPhotos = result.remainingDeletions;
