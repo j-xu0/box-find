@@ -8,12 +8,9 @@ services:
       - MONGO_PW=password8374
       - MONGO_URL=db
       - MONGO_URI=mongodb://user:password8374@mongodb/boxes-db?authSource=admin
-      - PHOTO_STORAGE_DIR=/app/data/photos
       - BODY_SIZE_LIMIT=50000000 # 50mb
       # Uncomment to run the app in read-only demo mode.
       # - ENVIRONMENT=DEMO
-    volumes:
-      - photos-data:/app/data/photos
     depends_on:
       - mongodb
   mongodb:
@@ -25,5 +22,4 @@ services:
       - mongodb-data:/data/db
 
 volumes:
-  photos-data:
   mongodb-data:

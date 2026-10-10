@@ -17,8 +17,6 @@ RUN bun install --frozen-lockfile --production
 FROM oven/bun:1-slim AS release
 WORKDIR /app
 
-RUN mkdir -p /app/data/photos && chown -R bun:bun /app/data
-
 USER bun
 
 COPY --from=builder --chown=bun:bun /app/build ./build
