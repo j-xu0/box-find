@@ -61,7 +61,7 @@ const mutate = async (
 			const body = await response.json();
 			if (
 				typeof body.image !== 'string' ||
-				!/^\/api\/photos\/[a-f0-9]{64}\.jpg$/.test(body.image)
+				!/^data:image\/jpeg;base64,[A-Za-z0-9+/]+={0,2}$/.test(body.image)
 			) {
 				return { ok: false, message: 'Server did not return the saved photo. Try again.' };
 			}
@@ -97,7 +97,7 @@ export const saveBoxChanges = async ({
 			results.push(await mutate(fetchImpl, '/api/saveImage', { id, base64 }));
 		return results;
 	})();
-	// Re-adding a photo wins over its queued removal. Wait for canonical upload IDs
+	// Re-adding a photo wins over its queued removal. Wait for processed photo identities
 	// before deleting, and clear superseded deletions so retries cannot remove it later.
 	const deletionRequests = (async () => {
 		const uploads = await uploadRequests;

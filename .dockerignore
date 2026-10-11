@@ -12,7 +12,6 @@ README.md
 .svelte-kit
 .vscode
 node_modules
-data
 build
 package
 **/.env

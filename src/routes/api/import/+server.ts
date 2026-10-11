@@ -1,22 +1,10 @@
 import { json } from '@sveltejs/kit';
 import Box from '$lib/models/box';
 import connectDB from '$lib/db/connect';
-import { isInlinePhoto } from '$lib/server/photo-storage';
 import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request }) => {
-	let importObj;
-	try {
-		({ importObj } = await request.json());
-		if (!Array.isArray(importObj)) throw new Error();
-		// Portable exports contain inline data, never references to another server's files.
-		for (const box of importObj) {
-			if (!Array.isArray(box?.images)) throw new Error();
-			for (const image of box.images) if (!isInlinePhoto(image)) throw new Error();
-		}
-	} catch {
-		return json({ error: 'Import requires inline image data, not file URLs.' }, { status: 400 });
-	}
+	const { importObj } = await request.json();
 
 	await connectDB();
 

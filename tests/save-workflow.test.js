@@ -2,7 +2,7 @@
 import { describe, expect, test } from 'bun:test';
 import { saveBoxChanges } from '../src/lib/save-workflow.ts';
 
-const savedImage = '/api/photos/' + 'a'.repeat(64) + '.jpg';
+const savedImage = 'data:image/jpeg;base64,YWFh';
 const jsonResponse = (body, status = 200) =>
 	new Response(JSON.stringify(body), {
 		status,
@@ -192,8 +192,8 @@ test('re-added canonical photo supersedes deletion after its upload settles', as
 		completeUpload = resolve;
 	});
 	const requests = [];
-	const otherPhoto = '/api/photos/' + 'b'.repeat(64) + '.jpg';
-	const failedPhoto = '/api/photos/' + 'c'.repeat(64) + '.jpg';
+	const otherPhoto = 'data:image/jpeg;base64,YmJi';
+	const failedPhoto = 'data:image/jpeg;base64,Y2Nj';
 	const save = saveBoxChanges({
 		id: 'garage',
 		contents: '',

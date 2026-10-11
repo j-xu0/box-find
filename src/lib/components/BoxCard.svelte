@@ -3,8 +3,6 @@
 	import MasonryGrid from '$lib/components/MasonryGrid.svelte';
 	import type { boxDataLean } from '$lib/types/types';
 
-	import { thumbnailUrl } from '$lib/photos';
-
 	export let item: boxDataLean;
 
 	$: contents = item.contents.trim().replace(/\n+/g, ', ');
@@ -32,7 +30,7 @@
 					</h4>
 					<MasonryGrid defaultDirection="end" gap={16} align="start" column={0}>
 						{#each item.images as photo}
-							<img src={thumbnailUrl(photo)} alt="Contents of {item.id}" loading="lazy" />
+							<img src={photo} alt="Contents of {item.id}" loading="lazy" />
 						{/each}
 					</MasonryGrid>
 				</div>
