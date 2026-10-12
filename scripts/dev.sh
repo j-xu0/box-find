@@ -6,6 +6,11 @@ state_dir="$PWD/.dev"
 pid_file="$state_dir/bun.pid"
 compose=(docker compose -f compose.dev.yaml)
 
+# Keep the lock file in place so every invocation locks the same inode.
+mkdir -p "$state_dir"
+exec 9> "$state_dir/lifecycle.lock"
+flock -x 9
+
 running() {
   [[ -f "$pid_file" ]] || return 1
   read -r dev_pid < "$pid_file"
@@ -31,7 +36,7 @@ case "${1:-}" in
     # Override any remote MONGO_URI in .env for this process only.
     MONGO_URI=mongodb://127.0.0.1:27018/boxes-dev \
       setsid bun node_modules/vite/bin/vite.js --host 127.0.0.1 --port 5173 --strictPort \
-      > "$state_dir/bun.log" 2>&1 < /dev/null &
+      > "$state_dir/bun.log" 2>&1 < /dev/null 9>&- &
     dev_pid=$!
     echo "$dev_pid" > "$pid_file"
     sleep 2

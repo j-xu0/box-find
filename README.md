@@ -4,7 +4,7 @@ A SvelteKit-based box storage organizer using shadcn-svelte, Tailwind CSS, sharp
 
 ## Development
 
-Requires Bun, Docker with Docker Compose, GNU Make, and Linux `setsid` (from util-linux).
+Requires Bun, Docker with Docker Compose, GNU Make, and Linux `setsid` and `flock` (from util-linux).
 
 ```sh
 make start
@@ -21,6 +21,7 @@ make stop
 This stops the managed Bun process and removes the dev containers/network. MongoDB data stays
 in the `box-find-dev_mongodb-data` Docker volume and is reused on the next start. Running
 `make start` again while the app is running does not launch another app process.
+Overlapping start/stop commands are serialized with a shared lifecycle lock.
 
 Dev MongoDB is available at `mongodb://127.0.0.1:27018/boxes-dev`. `make start` sets this URI
 for the app even if your `.env` contains a remote `MONGO_URI`; it does not edit `.env`.
