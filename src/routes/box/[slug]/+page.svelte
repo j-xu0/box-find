@@ -14,7 +14,6 @@
 	import ToastStack from '$lib/components/ToastStack.svelte';
 	import { Button, buttonVariants } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
-	import MasonryGrid from '$lib/components/MasonryGrid.svelte';
 	import { Input } from '$lib/components/ui/input';
 	import { Textarea } from '$lib/components/ui/textarea';
 	import { Label } from '$lib/components/ui/label';
@@ -487,7 +486,7 @@
 						</button>
 					</div>
 				{/if}
-				<MasonryGrid defaultDirection="end" gap={16} align="start" column={0}>
+				<div class="photo-list">
 					{#each photos as photo, index}
 						<div class="photo-stack">
 							<img src={photo} alt="Contents of {id}" />
@@ -503,7 +502,7 @@
 							</Button>
 						</div>
 					{/each}
-				</MasonryGrid>
+				</div>
 			</section>
 		</div>
 
@@ -615,6 +614,11 @@
 
 	.text-box {
 		padding-top: 0;
+	}
+
+	.photo-list {
+		display: grid;
+		gap: 1rem;
 	}
 
 	.photo-stack {
