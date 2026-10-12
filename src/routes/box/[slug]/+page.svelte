@@ -488,12 +488,12 @@
 					</div>
 				{/if}
 				<div class="photo-list">
-					{#each photos as photo, index}
+					{#each photos as photo, index (photo)}
 						<div class="photo-stack">
 							<PhotoPreview
 								src={photo}
 								alt="Contents of {id}"
-								previewId={JSON.stringify(['box', id, index])}
+								previewId={JSON.stringify(['box', id])}
 								label="View photo {index + 1} of {id}"
 							/>
 							<Button

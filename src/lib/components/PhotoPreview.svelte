@@ -1,6 +1,13 @@
+<script context="module" lang="ts">
+	// History entries refer to a mounted photo, never its position in an array.
+	const previewSession = Math.random().toString(36).slice(2);
+	let nextPreview = 0;
+</script>
+
 <script lang="ts">
 	import { pushState } from '$app/navigation';
 	import { page } from '$app/stores';
+	import { tick } from 'svelte';
 	import * as Dialog from '$lib/components/ui/dialog';
 
 	export let src: string;
@@ -8,22 +15,37 @@
 	export let previewId: string;
 	export let label: string;
 
-	$: previewOpen = $page.state.photoPreview === previewId;
+	const instanceId = `${previewSession}:${++nextPreview}`;
+	let trigger: HTMLButtonElement | undefined;
+	let wasOpen = false;
+
+	$: historyId = `${previewId}:${instanceId}`;
+	$: previewOpen = $page.state.photoPreview === historyId;
+	$: if (previewOpen !== wasOpen) {
+		wasOpen = previewOpen;
+		if (!previewOpen) restoreFocus();
+	}
+
+	async function restoreFocus() {
+		await tick();
+		if (!previewOpen && trigger?.isConnected) trigger.focus({ preventScroll: true });
+	}
 
 	function openPreview() {
 		// SvelteKit shallow routing preserves the page and any unsaved editor changes.
-		pushState('', { ...$page.state, photoPreview: previewId });
+		pushState('', { ...$page.state, photoPreview: historyId });
 	}
 
 	function handleOpenChange(nextOpen: boolean) {
 		if (nextOpen && !previewOpen) openPreview();
 		// Close, Escape and Android Back all consume the same history entry.
-		if (!nextOpen && $page.state.photoPreview === previewId) window.history.back();
+		if (!nextOpen && $page.state.photoPreview === historyId) window.history.back();
 	}
 </script>
 
 <Dialog.Root open={previewOpen} onOpenChange={handleOpenChange}>
 	<Dialog.Trigger
+		bind:el={trigger}
 		type="button"
 		class="block w-full overflow-hidden rounded-md bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
 		aria-label={label}

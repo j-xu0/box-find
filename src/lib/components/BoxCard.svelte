@@ -28,12 +28,12 @@
 				Photos <span class="font-normal text-muted-foreground">({item.images.length})</span>
 			</h4>
 			<div class="columns-2 gap-2 sm:columns-3 md:columns-4 lg:columns-5">
-				{#each item.images as photo, index}
+				{#each item.images as photo, index (photo)}
 					<div class="mb-2 break-inside-avoid">
 						<PhotoPreview
 							src={photo}
 							alt="Contents of {item.id}"
-							previewId={JSON.stringify(['inventory', item.id, index])}
+							previewId={JSON.stringify(['inventory', item.id])}
 							label="View photo {index + 1} of {item.id}"
 						/>
 					</div>
