@@ -26,6 +26,7 @@
 	export let currentPage = 1;
 
 	let searchQuery = $page.url.searchParams.get('query') ?? '';
+	let pageUrl = $page.url.href;
 	let searchedQuery = '';
 	let results: FuzzyFilterResult<boxDataLean>[] = [];
 	let searching = false;
@@ -38,7 +39,11 @@
 	let toasts: toastData[] = [];
 	let initialized = false;
 
-	$: searchQuery = $page.url.searchParams.get('query') ?? '';
+	// Shallow history updates change page state without changing $page.url.
+	$: if ($page.url.href !== pageUrl) {
+		pageUrl = $page.url.href;
+		searchQuery = $page.url.searchParams.get('query') ?? '';
+	}
 
 	$: displayedBoxes = searchQuery.trim() ? results.map((result) => result.item) : data.contents;
 	$: visiblePages = getVisiblePages(data.lastPage, currentPage);
@@ -58,10 +63,10 @@
 	}
 
 	function updateSearch(query: string) {
-		const url = new URL($page.url);
+		const url = new URL(window.location.href);
 		if (query.trim()) url.searchParams.set('query', query);
 		else url.searchParams.delete('query');
-		if (url.href !== $page.url.href) replaceState(url, $page.state);
+		if (url.href !== window.location.href) replaceState(url, $page.state);
 	}
 
 	function queueSearch(query: string) {
