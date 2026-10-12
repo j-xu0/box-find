@@ -6,6 +6,7 @@ declare global {
 		// interface Locals {}
 		// interface PageData {}
 		interface PageState {
+			photoPreview?: string;
 			cancelModal?: boolean;
 			editModal?: boolean;
 			deleteModal?: boolean;

@@ -12,6 +12,7 @@
 	import Reload from 'svelte-radix/Reload.svelte';
 	import Trash from 'svelte-radix/Trash.svelte';
 	import ToastStack from '$lib/components/ToastStack.svelte';
+	import PhotoPreview from '$lib/components/PhotoPreview.svelte';
 	import { Button, buttonVariants } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { Input } from '$lib/components/ui/input';
@@ -489,11 +490,16 @@
 				<div class="photo-list">
 					{#each photos as photo, index}
 						<div class="photo-stack">
-							<img src={photo} alt="Contents of {id}" />
+							<PhotoPreview
+								src={photo}
+								alt="Contents of {id}"
+								previewId={JSON.stringify(['box', id, index])}
+								label="View photo {index + 1} of {id}"
+							/>
 							<Button
-								variant="destructive"
+								variant="ghost"
 								size="icon"
-								class="absolute right-3 top-3 h-10 w-10 bg-red-600 text-white hover:bg-red-500"
+								class="absolute right-2 top-2 h-10 w-10 bg-background/70 text-muted-foreground backdrop-blur-sm hover:bg-red-600 hover:text-white focus-visible:bg-red-600 focus-visible:text-white"
 								aria-label="Remove photo {index + 1}"
 								disabled={busy}
 								on:click={() => removePhoto(index)}
@@ -617,20 +623,15 @@
 	}
 
 	.photo-list {
-		display: grid;
-		gap: 1rem;
+		columns: 2;
+		column-gap: 0.5rem;
 	}
 
 	.photo-stack {
+		break-inside: avoid;
+		margin-bottom: 0.5rem;
 		position: relative;
 		width: 100%;
-	}
-
-	.photo-stack img {
-		display: block;
-		width: 100%;
-		height: auto;
-		border-radius: var(--radius);
 	}
 
 	.action-buttons {
