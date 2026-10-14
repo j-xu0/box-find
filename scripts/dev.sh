@@ -33,6 +33,9 @@ case "${1:-}" in
     rm -f "$pid_file"
     bun install --frozen-lockfile
     "${compose[@]}" up -d --wait
+    export PHOTO_ENDPOINT=http://127.0.0.1:3900
+    export PHOTO_ACCESS_KEY=GK11111111111111111111111111111111
+    export PHOTO_SECRET_KEY=2222222222222222222222222222222222222222222222222222222222222222
     # Override any remote MONGO_URI in .env for this process only.
     MONGO_URI=mongodb://127.0.0.1:27018/boxes-dev \
       setsid bun node_modules/vite/bin/vite.js --host 127.0.0.1 --port 5173 --strictPort \
@@ -54,7 +57,7 @@ case "${1:-}" in
     fi
     rm -f "$pid_file"
     "${compose[@]}" down
-    echo 'Dev app and Mongo stopped. Database volume preserved.'
+    echo 'Dev app, Mongo and Garage stopped. Data volumes preserved.'
     ;;
   *)
     echo 'Usage: bash scripts/dev.sh {start|stop}' >&2

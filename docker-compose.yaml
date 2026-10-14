@@ -8,11 +8,17 @@ services:
       - MONGO_PW=password8374
       - MONGO_URL=db
       - MONGO_URI=mongodb://user:password8374@mongodb/boxes-db?authSource=admin
+      - PHOTO_ENDPOINT=http://garage:3900
+      - PHOTO_ACCESS_KEY=${PHOTO_ACCESS_KEY:-GK11111111111111111111111111111111}
+      - PHOTO_SECRET_KEY=${PHOTO_SECRET_KEY:-2222222222222222222222222222222222222222222222222222222222222222}
       - BODY_SIZE_LIMIT=50000000 # 50mb
       # Uncomment to run the app in read-only demo mode.
       # - ENVIRONMENT=DEMO
     depends_on:
-      - mongodb
+      mongodb:
+        condition: service_started
+      garage:
+        condition: service_healthy
   mongodb:
     image: mongodb/mongodb-community-server:7.0.5-ubuntu2204
     environment:
@@ -21,5 +27,26 @@ services:
     volumes:
       - mongodb-data:/data/db
 
+  garage:
+    image: dxflrs/garage:v2.4.1
+    command: ['/garage', 'server', '--single-node', '--default-bucket']
+    environment:
+      GARAGE_RPC_SECRET: ${GARAGE_RPC_SECRET:-1111111111111111111111111111111111111111111111111111111111111111}
+      GARAGE_DEFAULT_ACCESS_KEY: ${PHOTO_ACCESS_KEY:-GK11111111111111111111111111111111}
+      GARAGE_DEFAULT_SECRET_KEY: ${PHOTO_SECRET_KEY:-2222222222222222222222222222222222222222222222222222222222222222}
+      GARAGE_DEFAULT_BUCKET: photos
+    volumes:
+      - ./docker/garage.toml:/etc/garage.toml:ro
+      - garage-meta:/var/lib/garage/meta
+      - garage-data:/var/lib/garage/data
+    healthcheck:
+      test: ['CMD', '/garage', 'status']
+      interval: 2s
+      timeout: 5s
+      retries: 30
+      start_period: 5s
+
 volumes:
   mongodb-data:
+  garage-meta:
+  garage-data:

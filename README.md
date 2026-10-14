@@ -10,16 +10,16 @@ Requires Bun, Docker with Docker Compose, GNU Make, and Linux `setsid` and `floc
 make start
 ```
 
-This installs locked dependencies, starts local MongoDB through `compose.dev.yaml`, waits for
-MongoDB to become healthy, and starts the Bun/Vite dev server in the background with hot reload
+This installs locked dependencies, starts local MongoDB and Garage through `compose.dev.yaml`, waits for
+the services to become healthy, and starts the Bun/Vite dev server in the background with hot reload
 at http://127.0.0.1:5173. Use `make logs` to follow app output.
 
 ```sh
 make stop
 ```
 
-This stops the managed Bun process and removes the dev containers/network. MongoDB data stays
-in the `box-find-dev_mongodb-data` Docker volume and is reused on the next start. Running
+This stops the managed Bun process and removes the dev containers/network. MongoDB and photo data stay
+in the `box-find-dev_mongodb-data`, `box-find-dev_garage-meta`, and `box-find-dev_garage-data` Docker volumes and is reused on the next start. Running
 `make start` again while the app is running does not launch another app process.
 Overlapping start/stop commands are serialized with a shared lifecycle lock.
 
@@ -32,8 +32,22 @@ To inspect Mongo logs, run `docker compose -f compose.dev.yaml logs -f mongodb`.
 To **delete all local dev data**, stop the app and explicitly run
 `docker compose -f compose.dev.yaml down --volumes`.
 
-The dev setup is separate from the deployment Compose file below. Photos continue to be stored
-in MongoDB; Garage/S3 integration is a future change.
+The dev setup is separate from the deployment Compose file below. New photos are processed by
+Sharp, stored as JPEG objects in Garage, and referenced by `/photos/<hash>.jpg` URLs in MongoDB.
+The app serves these URLs through Garage's private S3 API; browser clients never receive S3 keys.
+Garage is available locally at `http://127.0.0.1:3900`. `make start` configures the app endpoint
+and credentials automatically. No existing photos are migrated.
+
+Both Compose files run Garage v2.4.1 with automatic single-node and `photos` bucket setup
+([Garage quick start](https://garagehq.deuxfleurs.fr/documentation/quick-start/)).
+For deployment, set `GARAGE_RPC_SECRET` (64 hex characters), `PHOTO_ACCESS_KEY` (`GK` followed
+by 32 hex characters), and `PHOTO_SECRET_KEY` (64 hex characters) in the Compose environment.
+The built-in credentials are local development defaults. Keep these values stable across restarts.
+The deployment S3 port is internal to Docker. Back up both Garage volumes alongside MongoDB;
+this single-node setup has no replication.
+
+Identical processed photos share one object. Removing a photo or box removes its MongoDB
+reference; Garage objects are retained so shared references and imported backups remain valid.
 
 ## Deployment
 
@@ -74,7 +88,7 @@ To enable it with Docker Compose, uncomment the `ENVIRONMENT=DEMO` entry in `doc
   - json body:
     - `{ id, contents }`
 - saveImage
-  - add `base64` to array of images for specified box ID
+  - process and upload `base64` to Garage, then add its photo URL to the box
   - json body:
     - `{ id, base64 }`
 - search
