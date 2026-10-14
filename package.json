@@ -25,11 +25,15 @@
 		"mongoose": "^8.9.5",
 		"sharp": "^0.35.5",
 		"svelte": "^5.56.5",
-		"svelte-adapter-bun": "^1.0.1"
+		"svelte-adapter-bun": "^1.0.1",
+		"yauzl": "^3.4.0",
+		"yazl": "^3.3.1"
 	},
 	"devDependencies": {
 		"@sveltejs/vite-plugin-svelte": "^7.2.0",
 		"@types/node": "^22.10.7",
+		"@types/yauzl": "^3.4.0",
+		"@types/yazl": "^3.3.1",
 		"autoprefixer": "10",
 		"bits-ui": "0.22.0",
 		"clsx": "^2.1.1",
