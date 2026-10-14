@@ -9,7 +9,7 @@ const fixture = (width, height) =>
 		.png()
 		.toBuffer();
 
-test('small photos stay small and remain inline MongoDB values', async () => {
+test('small photos stay small and produce deterministic JPEG data', async () => {
 	const image = inline(await fixture(100, 50));
 	const output = await processPhoto(image);
 	expect(output.startsWith('data:image/jpeg;base64,')).toBe(true);

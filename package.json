@@ -16,6 +16,7 @@
 		"format:check": "oxfmt --check ."
 	},
 	"dependencies": {
+		"@aws-sdk/client-s3": "^3.1150.0",
 		"@egjs/svelte-grid": "^1.16.0",
 		"@sveltejs/kit": "^2.69.3",
 		"dotenv": "^16.4.7",

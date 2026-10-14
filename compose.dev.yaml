@@ -14,5 +14,28 @@ services:
       retries: 30
       start_period: 5s
 
+  garage:
+    image: dxflrs/garage:v2.4.1
+    command: ['/garage', 'server', '--single-node', '--default-bucket']
+    environment:
+      GARAGE_RPC_SECRET: '1111111111111111111111111111111111111111111111111111111111111111'
+      GARAGE_DEFAULT_ACCESS_KEY: GK11111111111111111111111111111111
+      GARAGE_DEFAULT_SECRET_KEY: '2222222222222222222222222222222222222222222222222222222222222222'
+      GARAGE_DEFAULT_BUCKET: photos
+    ports:
+      - '127.0.0.1:3900:3900'
+    volumes:
+      - ./docker/garage.toml:/etc/garage.toml:ro
+      - garage-meta:/var/lib/garage/meta
+      - garage-data:/var/lib/garage/data
+    healthcheck:
+      test: ['CMD', '/garage', 'status']
+      interval: 2s
+      timeout: 5s
+      retries: 30
+      start_period: 5s
+
 volumes:
   mongodb-data:
+  garage-meta:
+  garage-data:
